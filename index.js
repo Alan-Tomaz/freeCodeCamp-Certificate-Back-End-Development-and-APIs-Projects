@@ -5,6 +5,8 @@ const app = express();
 const multer = require('multer');
 // Basic Configuration
 const port = process.env.PORT || 3000;
+const dns = require("dns");
+const { URL } = require("url");
 
 app.use(cors());
 
@@ -23,56 +25,53 @@ app.get('/', function (req, res) {
 let urls = [];
 
 
-app.post('/api/shorturl', function (req, res) {
-  console.log(req.body);
-  const { url } = req.body;
-  if (stringIsAValidUrl(url)) {
+app.post("/api/shorturl", function (req, res) {
+  const { original_url } = req.body;
 
-    const short_url = urls.length + 1;
+  try {
+    const url = new URL(original_url);
 
-    saveUrls(url);
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return res.json({ error: "invalid url" });
+    }
 
-    res.json({
-      original_url: url,
-      short_url
+    dns.lookup(url.hostname, (err) => {
+      if (err) {
+        console.log("B")
+        return res.json({ error: "invalid url" });
+      }
+
+      const short_url = urls.length + 1;
+
+      urlObj = {
+        original_url: original_url,
+        short_url
+      };
+
+      urls.push(urlObj);
+
+
+
+      res.json(urlObj);
     });
-  } else {
-    res.json({ error: 'invalid url' });
+
+  } catch (err) {
+    console.log(err)
+    res.json({ error: "invalid url" });
   }
 });
 
 app.get("/api/shorturl/:shorturl", (req, res) => {
-  console.log(req.params.shorturl);
-
   const shortUrlNumber = Number(req.params.shorturl);
 
-  const foundUrl = readUrls(shortUrlNumber);
+  const found = urls.find(u => u.short_url === shortUrlNumber);
 
-  if (!foundUrl) {
-    return res.status(404).json({ error: "URL não encontrada" });
+  if (!found) {
+    return res.json({ error: "No short URL found" });
   }
 
-  res.redirect(foundUrl);
+  res.redirect(found.original_url);
 });
-
-function saveUrls(url) {
-  urls.push(url)
-  console.log(urls)
-}
-
-function readUrls(index) {
-
-  return urls[index - 1];
-}
-
-const stringIsAValidUrl = (s) => {
-  try {
-    new URL(s);
-    return true;
-  } catch (err) {
-    return false;
-  }
-};
 
 app.listen(port, function () {
   console.log(`Listening on port ${port}`);
