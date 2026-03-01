@@ -14,7 +14,7 @@ app.use(cors({ optionsSuccessStatus: 200 }));  // some legacy browsers choke on 
 app.use(express.static('public'));
 
 // http://expressjs.com/en/starter/basic-routing.html
-app.get("/api", function (req, res) {
+app.get("/api/", function (req, res) {
   res.json({ "unix": Date.now(), "utc": new Date().toUTCString() });
 });
 
