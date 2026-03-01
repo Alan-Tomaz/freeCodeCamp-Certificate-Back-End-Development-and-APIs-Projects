@@ -25,8 +25,7 @@ app.get("/api/hello", function (req, res) {
 });
 
 app.get("/api/:date", function (req, res) {
-  console.log(req.params.date);
-  if (!isNaN(req.params.date)) {
+  if (isValidTimestamp(req.params.date)) {
     const date = new Date(parseInt(req.params.date));
     res.json({ unix: date.getTime(), utc: new Date(date).toUTCString() });
   }
@@ -35,8 +34,10 @@ app.get("/api/:date", function (req, res) {
   }
 });
 
-
-
+function isValidTimestamp(timestamp) {
+  const date = new Date(parseInt(timestamp)); // The Date constructor can accept a number (timestamp) or date string
+  return !isNaN(date.getTime()); // Check if the time value is a valid number
+}
 
 
 // Listen on port set in environment variable or default to 3000
