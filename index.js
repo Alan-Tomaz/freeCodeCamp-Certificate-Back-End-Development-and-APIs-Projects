@@ -27,7 +27,7 @@ let urls = [];
 
 app.post("/api/shorturl", function (req, res) {
   const { url } = req.body;
-  console.log(url)
+  console.log("URL SALVA:", url)
 
   try {
     const urlObject = new URL(url);
@@ -52,7 +52,7 @@ app.post("/api/shorturl", function (req, res) {
       urls.push(urlObj);
 
 
-      console.log(urlObj)
+      console.log("URL OBJECT:", urlObj)
       res.json(urlObj);
     });
 
@@ -63,7 +63,7 @@ app.post("/api/shorturl", function (req, res) {
 });
 
 app.get("/api/shorturl/:shorturl", (req, res) => {
-  console.log(req.params)
+  console.log("PARAMS:", req.params)
 
   const shortUrlNumber = parseInt(req.params.shorturl);
 
@@ -73,6 +73,7 @@ app.get("/api/shorturl/:shorturl", (req, res) => {
     return res.json({ error: "No short URL found" });
   }
 
+  console.log("URL ENCONTRADA:", found)
   res.redirect(found.original_url);
 });
 
