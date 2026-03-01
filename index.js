@@ -37,25 +37,45 @@ let num = 0;
 
 
 app.post('/api/shorturl', function (req, res) {
+  let urlString;
+  if (req.body.url !== undefined) {
+    urlString = req.body.url;
+  }
+  if (req.body.original_url !== undefined) {
+    urlString = req.body.original_url;
+  }
 
-  const urlString = req.body.url;
-  const lookDns = dns.lookup(urlparser.parse(urlString).hostname, async (req, validAddress) => {
-    if (!validAddress) {
-      res.json({ error: "Invalid URL" })
-    } else {
-      const countUrls = await storeUrls.countDocuments({});
-      const urlStore = {
-        urlString,
-        short_url: countUrls
+  try {
+    const parsedUrl = new URL(urlString);
+
+    if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+      return res.json({ error: "invalid url" });
+    }
+
+    dns.lookup(parsedUrl.hostname, async (err) => {
+
+      if (err) {
+        return res.json({ error: "invalid url" });
       }
-      const respond = await storeUrls.insertOne(urlStore);
-      console.log(respond);
+
+      const countUrls = await storeUrls.countDocuments({}) + 1;
+
+      const urlStore = {
+        original_url: urlString,
+        short_url: countUrls
+      };
+
+      await storeUrls.insertOne(urlStore);
+
       res.json({
         original_url: urlString,
         short_url: countUrls
       });
-    }
-  })
+    });
+
+  } catch {
+    res.json({ error: "invalid url" });
+  }
 
   /*  const urlRegex = /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
    const url = req.body.url;
