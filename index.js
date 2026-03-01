@@ -77,13 +77,9 @@ app.post("/api/shorturl", function (req, res) {
 app.get("/api/shorturl/:short_url", (req, res) => {
   console.log("PARAMS:", req.params)
 
-  const shortUrlNumber = Number(req.params.short_url);
+  const shortUrlNumber = req.params.short_url;
 
   const found = urls.find(u => u.short_url === shortUrlNumber);
-
-  if (!found) {
-    return res.status(404).json({ error: "No short URL found" });
-  }
 
   console.log("URL ENCONTRADA:", found)
   res.redirect(302, found.original_url);
