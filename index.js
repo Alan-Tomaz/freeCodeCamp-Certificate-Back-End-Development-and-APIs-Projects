@@ -77,7 +77,7 @@ app.post("/api/shorturl", function (req, res) {
 app.get("/api/shorturl/:short_url", (req, res) => {
   console.log("PARAMS:", req.params)
 
-  const shortUrlNumber = req.params.short_url;
+  const shortUrlNumber = Number(req.params.short_url);
 
   const found = urls.find(u => u.short_url === shortUrlNumber);
 
