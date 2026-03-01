@@ -27,7 +27,7 @@ app.get("/api/hello", function (req, res) {
 app.get("/api/:date", function (req, res) {
   console.log(req.params.date);
   if (!isNaN(req.params.date)) {
-    const date = new Date(req.params.date);
+    const date = new Date(parseInt(req.params.date));
     res.json({ "unix": Date.now(date), "utc": new Date(date).toUTCString() });
   }
   else {
