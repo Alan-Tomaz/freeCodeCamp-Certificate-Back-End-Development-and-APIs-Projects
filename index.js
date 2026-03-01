@@ -36,7 +36,7 @@ let urls = [];
 let num = 0;
 
 
-app.post("/api/shorturl", async function (req, res) {
+app.post('/api/shorturl', function (req, res) {
 
   const urlString = req.body.url;
   const lookDns = dns.lookup(urlparser.parse(urlString).hostname, async (req, validAddress) => {
@@ -113,7 +113,8 @@ app.post("/api/shorturl", async function (req, res) {
    */
 });
 
-app.get('/api/shorturl/:short_url', async (req, res) => {
+app.get("/api/shorturl/:short_url", async (req, res) => {
+
   const shorturl = req.params.short_url;
   const urlStore = await storeUrls.findOne({ short_url: +shorturl })
   res.redirect(urlStore.urlString);
