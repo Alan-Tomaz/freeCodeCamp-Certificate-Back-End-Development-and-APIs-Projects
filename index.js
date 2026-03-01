@@ -6,7 +6,9 @@ const multer = require('multer');
 // Basic Configuration
 const port = process.env.PORT || 3000;
 const dns = require("dns");
-const { URL } = require("url");
+/* const { URL} = require("url"); */
+const urlparser = require("url");
+
 
 app.use(cors());
 
@@ -26,26 +28,15 @@ let urls = [];
 
 
 app.post("/api/shorturl", function (req, res) {
-  const { url } = req.body;
-  console.log("URL SALVA:", url)
-
-  try {
-    const urlObject = new URL(url);
-
-    if (urlObject.protocol !== "http:" && urlObject.protocol !== "https:") {
-      return res.json({ error: "invalid url" });
-    }
-
-    dns.lookup(urlObject.hostname, (err) => {
-      if (err) {
-        console.log("B")
-        return res.status(400).json({ error: "invalid url" });
-      }
-
+  const urlString = req.body.url;
+  const lookDns = dns.lookup(urlparser.parse(urlString).hostname, async (req, validAddress) => {
+    if (!validAddress) {
+      res.json({ error: "Invalid URL" })
+    } else {
       const short_url = urls.length + 1;
 
       urlObj = {
-        original_url: url.trim(),
+        original_url: urlString.trim(),
         short_url
       };
 
@@ -54,18 +45,39 @@ app.post("/api/shorturl", function (req, res) {
 
       console.log("URL OBJECT:", urlObj)
       res.json(urlObj);
-    });
+    }
+  })
 
-  } catch (err) {
-    console.log(err)
-    res.status(400).json({ error: "invalid url" });
-  }
+  /*   const { url } = req.body;
+    console.log("URL SALVA:", url)
+  
+    try {
+      const urlObject = new URL(url);
+  
+      if (urlObject.protocol !== "http:" && urlObject.protocol !== "https:") {
+        return res.json({ error: "invalid url" });
+      }
+  
+      dns.lookup(urlObject.hostname, (err) => {
+        if (err) {
+          console.log("B")
+          return res.status(400).json({ error: "invalid url" });
+        }
+  
+      
+      });
+  
+    } catch (err) {
+      console.log(err)
+      res.status(400).json({ error: "invalid url" });
+    }
+   */
 });
 
-app.get("/api/shorturl/:shorturl", (req, res) => {
+app.get("/api/shorturl/:short_url", (req, res) => {
   console.log("PARAMS:", req.params)
 
-  const shortUrlNumber = Number(req.params.shorturl);
+  const shortUrlNumber = Number(req.params.short_url);
 
   const found = urls.find(u => u.short_url === shortUrlNumber);
 
