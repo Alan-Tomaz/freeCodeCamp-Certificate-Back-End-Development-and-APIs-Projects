@@ -8,9 +8,11 @@ const port = process.env.PORT || 3000;
 
 app.use(cors());
 
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use('/public', express.static(`${process.cwd()}/public`));
+
 
 app.get('/', function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
@@ -22,15 +24,16 @@ let urls = [];
 
 
 app.post('/api/shorturl', function (req, res) {
-  const { original_url } = req.body;
-  if (stringIsAValidUrl(original_url)) {
+  console.log(req.body);
+  const { url } = req.body;
+  if (stringIsAValidUrl(url)) {
 
     const short_url = urls.length + 1;
 
-    saveUrls(original_url);
+    saveUrls(url);
 
     res.json({
-      original_url: original_url,
+      original_url: url,
       short_url
     });
   } else {
