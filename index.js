@@ -10,7 +10,7 @@ const { URL } = require("url");
 
 app.use(cors());
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.use('/public', express.static(`${process.cwd()}/public`));
@@ -62,7 +62,7 @@ app.post("/api/shorturl", function (req, res) {
 });
 
 app.get("/api/shorturl/:shorturl", (req, res) => {
-  const shortUrlNumber = Number(req.params.shorturl);
+  const shortUrlNumber = parseInt(req.params.shorturl);
 
   const found = urls.find(u => u.short_url === shortUrlNumber);
 
