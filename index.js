@@ -45,7 +45,7 @@ app.post("/api/shorturl", function (req, res) {
       const short_url = urls.length + 1;
 
       urlObj = {
-        original_url: url,
+        original_url: url.trim(),
         short_url
       };
 
@@ -65,16 +65,16 @@ app.post("/api/shorturl", function (req, res) {
 app.get("/api/shorturl/:shorturl", (req, res) => {
   console.log("PARAMS:", req.params)
 
-  const shortUrlNumber = parseInt(req.params.shorturl);
+  const shortUrlNumber = Number(req.params.shorturl);
 
   const found = urls.find(u => u.short_url === shortUrlNumber);
 
   if (!found) {
-    return res.json({ error: "No short URL found" });
+    return res.status(404).json({ error: "No short URL found" });
   }
 
   console.log("URL ENCONTRADA:", found)
-  res.redirect(found.original_url);
+  res.redirect(302, found.original_url);
 });
 
 app.listen(port, function () {
