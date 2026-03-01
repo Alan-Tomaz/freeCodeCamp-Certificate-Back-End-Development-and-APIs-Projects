@@ -14,7 +14,7 @@ app.use(cors({ optionsSuccessStatus: 200 }));  // some legacy browsers choke on 
 app.use(express.static('public'));
 
 // http://expressjs.com/en/starter/basic-routing.html
-app.get("/", function (req, res) {
+app.get("/api", function (req, res) {
   res.json({ "unix": Date.now(), "utc": new Date().toUTCString() });
 });
 
@@ -26,8 +26,13 @@ app.get("/api/hello", function (req, res) {
 
 app.get("/api/:date", function (req, res) {
   console.log(req.params.date);
-  const date = isNaN(req.params.date) ? new Date(req.params.date) : new Date(parseInt(req.params.date));
-  res.json({ "unix": Date.now(date), "utc": new Date(date).toUTCString() });
+  if (isNaN(req.params.date)) {
+    const date = new Date(req.params.date);
+    res.json({ "unix": Date.now(date), "utc": new Date(date).toUTCString() });
+  }
+  else {
+    res.json({ error: "Invalid Date" });
+  }
 });
 
 
