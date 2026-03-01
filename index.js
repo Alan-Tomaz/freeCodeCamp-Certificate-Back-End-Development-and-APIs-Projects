@@ -20,7 +20,7 @@ const storeUrls = db.collection('urls');
 
 app.use(cors());
 app.use(limiter);
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.use('/public', express.static(`${process.cwd()}/public`));
@@ -58,18 +58,24 @@ app.post('/api/shorturl', function (req, res) {
         return res.json({ error: "invalid url" });
       }
 
-      const countUrls = await storeUrls.countDocuments({}) + 1;
+      const last = await storeUrls
+        .find({})
+        .sort({ short_url: -1 })
+        .limit(1)
+        .toArray();
+
+      const nextShort = last.length > 0 ? last[0].short_url + 1 : 1;
 
       const urlStore = {
         original_url: urlString,
-        short_url: countUrls
+        short_url: nextShort
       };
 
       await storeUrls.insertOne(urlStore);
 
       res.json({
         original_url: urlString,
-        short_url: countUrls
+        short_url: nextShort
       });
     });
 
@@ -137,7 +143,11 @@ app.get("/api/shorturl/:short_url", async (req, res) => {
   const shorturl = Number(req.params.short_url);
   console.log(await storeUrls.findOne({ short_url: shorturl }))
   const urlStore = await storeUrls.findOne({ short_url: shorturl });
-  res.redirect(urlStore.original_url);
+  if (!urlStore) {
+    return res.status(404).json({ error: "No short URL found" });
+  }
+  return res.redirect(302, urlStore.original_url);
+
   /*   const short = parseInt(req.params.short_url);
     const url = urls.find(data => data.short_url === short);
     if (url) {
