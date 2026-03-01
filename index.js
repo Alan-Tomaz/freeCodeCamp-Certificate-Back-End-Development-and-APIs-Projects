@@ -15,7 +15,7 @@ app.use(express.static('public'));
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get("/api/", function (req, res) {
-  res.json({ "unix": Date.now(), "utc": new Date().toUTCString() });
+  res.json({ unix: Date.now(), utc: new Date().toUTCString() });
 });
 
 
@@ -28,7 +28,7 @@ app.get("/api/:date", function (req, res) {
   console.log(req.params.date);
   if (!isNaN(req.params.date)) {
     const date = new Date(parseInt(req.params.date));
-    res.json({ "unix": Date.now(date), "utc": new Date(date).toUTCString() });
+    res.json({ unix: Date.now(date), utc: new Date(date).toUTCString() });
   }
   else {
     res.json({ error: "Invalid Date" });
