@@ -20,44 +20,56 @@ app.get('/', function (req, res) {
 
 let urls = [];
 
-app.get("/api/shorturl/:shorturl", (req, res) => {
 
-  console.log("Acessando URL encurtada:", req.params.shorturl);
+app.post('/api/shorturl', function (req, res) {
+  const { original_url } = req.body;
+  if (stringIsAValidUrl(original_url)) {
+
+    const short_url = urls.length + 1;
+
+    saveUrls(original_url);
+
+    res.json({
+      original_url: original_url,
+      short_url
+    });
+  } else {
+    res.json({ error: "invalid url" });
+  }
+});
+
+app.get("/api/shorturl/:shorturl", (req, res) => {
+  console.log(req.params.shorturl);
 
   const shortUrlNumber = Number(req.params.shorturl);
 
   const foundUrl = readUrls(shortUrlNumber);
 
-  if (foundUrl) {
+  if (!foundUrl) {
     return res.status(404).json({ error: "URL não encontrada" });
   }
 
   res.redirect(foundUrl);
 });
 
-app.post('/api/shorturl', function (req, res) {
-  const { original_url } = req.body;
-
-  const short_url = urls.length;
-
-  const newUrl = {
-    original_url,
-    short_url
-  };
-
-  saveUrls(original_url);
-
-  res.json(newUrl);
-});
-
 function saveUrls(url) {
   urls.push(url)
+  console.log(urls)
 }
 
 function readUrls(index) {
 
-  return urls[index];
+  return urls[index - 1];
 }
+
+const stringIsAValidUrl = (s) => {
+  try {
+    new URL(s);
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
 
 app.listen(port, function () {
   console.log(`Listening on port ${port}`);
