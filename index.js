@@ -51,7 +51,7 @@ app.post("/api/shorturl", function (req, res) {
       urls.push(urlObj);
 
 
-
+      console.log(urlObj)
       res.json(urlObj);
     });
 
