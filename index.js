@@ -26,16 +26,16 @@ let urls = [];
 
 
 app.post("/api/shorturl", function (req, res) {
-  const { url } = req.body;
+  const { original_url } = req.body;
 
   try {
-    const urlObject = new URL(url);
+    const url = new URL(original_url);
 
-    if (urlObject.protocol !== "http:" && urlObject.protocol !== "https:") {
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
       return res.json({ error: "invalid url" });
     }
 
-    dns.lookup(urlObject.hostname, (err) => {
+    dns.lookup(url.hostname, (err) => {
       if (err) {
         console.log("B")
         return res.json({ error: "invalid url" });
@@ -44,7 +44,7 @@ app.post("/api/shorturl", function (req, res) {
       const short_url = urls.length + 1;
 
       urlObj = {
-        original_url: url,
+        original_url: original_url,
         short_url
       };
 
