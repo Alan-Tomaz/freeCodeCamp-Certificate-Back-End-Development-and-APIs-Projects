@@ -16,6 +16,7 @@ app.get('/', function (req, res) {
 });
 
 app.post("/api/fileanalyse", upload.single("upfile"), (req, res) => {
+  console.log("Received file upload request");
   console.log(req.file)
 
   if (!req.file) {
