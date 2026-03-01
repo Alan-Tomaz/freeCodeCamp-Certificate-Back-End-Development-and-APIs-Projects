@@ -27,6 +27,7 @@ let urls = [];
 
 app.post("/api/shorturl", function (req, res) {
   const { url } = req.body;
+  console.log(url)
 
   try {
     const urlObject = new URL(url);
@@ -62,6 +63,8 @@ app.post("/api/shorturl", function (req, res) {
 });
 
 app.get("/api/shorturl/:shorturl", (req, res) => {
+  console.log(req.params)
+
   const shortUrlNumber = parseInt(req.params.shorturl);
 
   const found = urls.find(u => u.short_url === shortUrlNumber);
