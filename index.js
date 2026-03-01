@@ -27,7 +27,7 @@ app.get('/', function (req, res) {
 let urls = [];
 
 
-app.post("/api/shorturl", function (req, res) {
+app.post("/api/shorturl", async function (req, res) {
   const urlString = req.body.url;
   const lookDns = dns.lookup(urlparser.parse(urlString).hostname, async (req, validAddress) => {
     if (!validAddress) {
@@ -74,7 +74,7 @@ app.post("/api/shorturl", function (req, res) {
    */
 });
 
-app.get("/api/shorturl/:short_url", (req, res) => {
+app.get("/api/shorturl/:short_url", async (req, res) => {
   console.log("PARAMS:", req.params)
 
   const shortUrlNumber = Number(req.params.short_url);
@@ -82,7 +82,7 @@ app.get("/api/shorturl/:short_url", (req, res) => {
   const found = urls.find(u => u.short_url === shortUrlNumber);
 
   console.log("URL ENCONTRADA:", found)
-  res.redirect(302, found.original_url);
+  res.redirect(found.original_url);
 });
 
 app.listen(port, function () {
