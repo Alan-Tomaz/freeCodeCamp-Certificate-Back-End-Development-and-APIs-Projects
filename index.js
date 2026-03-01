@@ -134,10 +134,10 @@ app.post('/api/shorturl', function (req, res) {
 });
 
 app.get("/api/shorturl/:short_url", async (req, res) => {
-
-  const shorturl = req.params.short_url;
-  const urlStore = await storeUrls.findOne({ short_url: +shorturl })
-  res.redirect(urlStore.urlString);
+  const shorturl = Number(req.params.short_url);
+  console.log(await storeUrls.findOne({ short_url: shorturl }))
+  const urlStore = await storeUrls.findOne({ short_url: shorturl });
+  res.redirect(urlStore.original_url);
   /*   const short = parseInt(req.params.short_url);
     const url = urls.find(data => data.short_url === short);
     if (url) {
